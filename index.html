@@ -478,27 +478,49 @@
       <p class="cta-title">Be the first to know when we launch.</p>
       <p class="cta-sub">Get early access, updates, and exclusive news.</p>
 
-      <form name="contact" netlify>
-  <p>
-    <label>Name <input type="text" name="name" /></label>
-  </p>
-  <p>
-    <label>Email <input type="email" name="email" /></label>
-  </p>
-  <p>
-    <button type="submit">Send</button>
-  </p>
+      <form
+  name="contact"
+  method="POST"
+  data-netlify="true"
+  netlify
+  class="email-form"
+  id="form"
+>
+  <input type="hidden" name="form-name" value="contact" />
+
+  <input
+    type="text"
+    name="name"
+    placeholder="Your name"
+    required
+  />
+
+  <input
+    type="email"
+    name="email"
+    placeholder="Enter your email address"
+    autocomplete="email"
+    required
+  />
+
+  <button type="submit">Notify Me</button>
 </form>
 
-      <div class="email-form" id="form">
-        <input type="email" id="emailInput" placeholder="Enter your email address" autocomplete="email"/>
-        <button onclick="handleSubmit()">Notify Me</button>
-      </div>
-      <div class="success-msg" id="successMsg">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-        You're on the list. We'll be in touch.
-      </div>
-    </div>
+<div class="success-msg" id="successMsg">
+  <svg
+    width="14"
+    height="14"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <polyline points="20 6 9 17 4 12"></polyline>
+  </svg>
+  You're on the list. We'll be in touch.
+</div>
 
   </section>
 
