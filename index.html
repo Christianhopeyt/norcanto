@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Norcanto — Coming Soon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black: #0a0a0a;
+    --surface: #111111;
+    --border: rgba(255,255,255,0.08);
+    --text: #f0f0ee;
+    --muted: rgba(240,240,238,0.45);
+    --teal: #1D9E75;
+    --teal-dim: rgba(29,158,117,0.15);
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--black);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Noise grain overlay ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.5;
+  }
+
+  /* ── Radial ambient glow ── */
+  .glow-top {
+    position: fixed;
+    top: -200px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 800px;
+    height: 600px;
+    background: radial-gradient(ellipse at center, rgba(255,255,255,0.04) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .glow-mid {
+    position: fixed;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    height: 400px;
+    background: radial-gradient(ellipse at center, rgba(29,158,117,0.06) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── Sweep lines ── */
+  .lines-svg {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.18;
+  }
+
+  /* ── Page layout ── */
+  .page {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Nav ── */
+  nav {
+    padding: 28px 40px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: fadeDown 0.8s ease both;
+  }
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+  .nav-icon {
+    width: 32px;
+    height: 32px;
+    background: #1a1a1a;
+    border-radius: 8px;
+    border: 0.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .nav-wordmark {
+    font-family: 'Syne', sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.3px;
+  }
+
+  /* ── Hero ── */
+  .hero {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px 24px 60px;
+    gap: 0;
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: rgba(255,255,255,0.05);
+    border: 0.5px solid var(--border);
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    margin-bottom: 36px;
+    animation: fadeUp 0.9s 0.1s ease both;
+  }
+  .pill-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--teal);
+    animation: pulse 2s infinite;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(42px, 8vw, 80px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -2px;
+    color: var(--text);
+    margin-bottom: 4px;
+    animation: fadeUp 0.9s 0.2s ease both;
+  }
+  h1 .dim {
+    color: rgba(240,240,238,0.35);
+  }
+
+  .hero-sub {
+    font-size: clamp(14px, 2vw, 16px);
+    color: var(--muted);
+    line-height: 1.7;
+    max-width: 420px;
+    margin: 28px auto 0;
+    font-weight: 300;
+    animation: fadeUp 0.9s 0.3s ease both;
+  }
+
+  /* ── Divider line ── */
+  .rule {
+    width: 40px;
+    height: 1px;
+    background: var(--border);
+    margin: 36px auto;
+    animation: fadeUp 0.9s 0.4s ease both;
+  }
+
+  .launch-label {
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    animation: fadeUp 0.9s 0.45s ease both;
+  }
+  .launch-text {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 48px;
+    animation: fadeUp 0.9s 0.5s ease both;
+  }
+
+  /* ── 3D icon block ── */
+  .icon-3d-wrap {
+    margin: 0 auto 52px;
+    animation: fadeUp 1s 0.55s ease both;
+  }
+  .icon-3d {
+    width: 140px;
+    height: 140px;
+    position: relative;
+  }
+  /* Perspective cube face */
+  .face-front {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #222 0%, #181818 100%);
+    border-radius: 24px;
+    border: 0.5px solid rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06);
+  }
+  /* Side shadow to give 3D illusion */
+  .face-side {
+    position: absolute;
+    top: 8px;
+    left: -8px;
+    width: 16px;
+    height: 100%;
+    background: linear-gradient(90deg, #0d0d0d, #151515);
+    border-radius: 4px 0 0 4px;
+    transform: skewY(-2deg);
+    border: 0.5px solid rgba(255,255,255,0.04);
+  }
+  .face-bottom {
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 100%;
+    height: 16px;
+    background: linear-gradient(180deg, #0d0d0d, #0a0a0a);
+    border-radius: 0 0 4px 4px;
+    transform: skewX(-2deg);
+    border: 0.5px solid rgba(255,255,255,0.03);
+  }
+  .n-mark {
+    width: 64px;
+    height: 64px;
+  }
+
+  /* ── CTA section ── */
+  .cta-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    animation: fadeUp 0.9s 0.65s ease both;
+  }
+  .bell-icon {
+    width: 36px;
+    height: 36px;
+    border: 0.5px solid var(--border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+    background: rgba(255,255,255,0.03);
+  }
+  .cta-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .cta-sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+
+  .email-form {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    background: rgba(255,255,255,0.04);
+    border: 0.5px solid var(--border);
+    border-radius: 100px;
+    padding: 5px 5px 5px 20px;
+    width: 100%;
+    max-width: 420px;
+    transition: border-color 0.2s;
+  }
+  .email-form:focus-within {
+    border-color: rgba(255,255,255,0.2);
+  }
+  .email-form input {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    min-width: 0;
+  }
+  .email-form input::placeholder {
+    color: rgba(240,240,238,0.3);
+  }
+  .email-form button {
+    background: var(--text);
+    color: var(--black);
+    border: none;
+    border-radius: 100px;
+    padding: 10px 22px;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity 0.15s, transform 0.15s;
+    flex-shrink: 0;
+  }
+  .email-form button:hover {
+    opacity: 0.88;
+    transform: scale(0.98);
+  }
+  .email-form button:active {
+    transform: scale(0.96);
+  }
+
+  .success-msg {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--teal);
+    background: var(--teal-dim);
+    border: 0.5px solid rgba(29,158,117,0.3);
+    border-radius: 100px;
+    padding: 8px 18px;
+    margin-top: 4px;
+  }
+
+  /* ── Footer ── */
+  footer {
+    padding: 28px 40px;
+    border-top: 0.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    animation: fadeUp 0.9s 0.7s ease both;
+  }
+  .footer-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .footer-tagline {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .footer-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .footer-copy {
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .social-links {
+    display: flex;
+    gap: 14px;
+  }
+  .social-links a {
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.15s;
+    display: flex;
+  }
+  .social-links a:hover {
+    color: var(--text);
+  }
+  .social-links svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+  }
+
+  /* ── Animations ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+  }
+  .icon-3d { animation: float 4s ease-in-out infinite; }
+
+  /* ── Responsive ── */
+  @media (max-width: 600px) {
+    nav { padding: 20px 20px; }
+    footer { padding: 20px; flex-direction: column; align-items: flex-start; gap: 12px; }
+    .footer-right { flex-direction: column; align-items: flex-start; gap: 10px; }
+    .icon-3d { width: 110px; height: 110px; }
+    .n-mark { width: 50px; height: 50px; }
+    .face-front { border-radius: 18px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Ambient effects -->
+<div class="glow-top"></div>
+<div class="glow-mid"></div>
+
+<!-- Sweep lines (matching the design) -->
+<svg class="lines-svg" viewBox="0 0 900 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="450" cy="520" rx="520" ry="180" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="0.8"/>
+  <ellipse cx="450" cy="540" rx="580" ry="220" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="0.6"/>
+  <ellipse cx="450" cy="500" rx="440" ry="140" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="0.6"/>
+</svg>
+
+<div class="page">
+
+  <!-- Nav -->
+  <nav>
+    <a class="nav-logo" href="#">
+      <div class="nav-icon">
+        <svg width="18" height="18" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M13 38V14L26 31L39 14V38" fill="none" stroke="#f0f0ee" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+          <path d="M26 31L39 14" fill="none" stroke="#1D9E75" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <span class="nav-wordmark">Norcanto</span>
+    </a>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+
+    <div class="pill">
+      <span class="pill-dot"></span>
+      Something exceptional is coming
+    </div>
+
+    <h1>We're Building<br/><span class="dim">What's Next.</span></h1>
+
+    <p class="hero-sub">Norcanto is a new-generation SaaS ecosystem of productivity and AI tools designed to empower the way you work.</p>
+
+    <div class="rule"></div>
+
+    <p class="launch-label">Official Launch</p>
+    <p class="launch-text">Coming Soon</p>
+
+    <!-- 3D Logo block -->
+    <div class="icon-3d-wrap">
+      <div class="icon-3d">
+        <div class="face-side"></div>
+        <div class="face-bottom"></div>
+        <div class="face-front">
+          <svg class="n-mark" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M14 50V14L32 38L50 14V50" fill="none" stroke="rgba(240,240,238,0.9)" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+            <path d="M32 38L50 14" fill="none" stroke="rgba(240,240,238,0.5)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-section">
+      <div class="bell-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(240,240,238,0.6)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+      </div>
+      <p class="cta-title">Be the first to know when we launch.</p>
+      <p class="cta-sub">Get early access, updates, and exclusive news.</p>
+
+      <div class="email-form" id="form">
+        <input type="email" id="emailInput" placeholder="Enter your email address" autocomplete="email"/>
+        <button onclick="handleSubmit()">Notify Me</button>
+      </div>
+      <div class="success-msg" id="successMsg">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        You're on the list. We'll be in touch.
+      </div>
+    </div>
+
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-left">
+      <a class="nav-logo" href="#" style="text-decoration:none; display:flex; align-items:center; gap:8px;">
+        <div class="nav-icon" style="width:26px;height:26px;border-radius:6px;">
+          <svg width="14" height="14" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M13 38V14L26 31L39 14V38" fill="none" stroke="#f0f0ee" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+            <path d="M26 31L39 14" fill="none" stroke="#1D9E75" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <span class="nav-wordmark" style="font-size:14px;">Norcanto</span>
+      </a>
+      <p class="footer-tagline">Building the future of productivity.<br/>One powerful tool at a time.</p>
+    </div>
+    <div class="footer-right">
+      <p class="footer-copy">© 2025 Norcanto. All rights reserved.</p>
+      <div class="social-links">
+        <!-- LinkedIn -->
+        <a href="#" aria-label="LinkedIn">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+        </a>
+        <!-- Twitter/X -->
+        <a href="#" aria-label="Twitter">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        </a>
+        <!-- Email -->
+        <a href="mailto:hello@norcanto.com" aria-label="Email">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6" fill="none" stroke="var(--black)" stroke-width="1.5"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+function handleSubmit() {
+  const input = document.getElementById('emailInput');
+  const form = document.getElementById('form');
+  const success = document.getElementById('successMsg');
+  const val = input.value.trim();
+  if (!val || !val.includes('@')) {
+    input.style.color = '#E24B4A';
+    setTimeout(() => input.style.color = '', 800);
+    return;
+  }
+  form.style.display = 'none';
+  success.style.display = 'flex';
+}
+document.getElementById('emailInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') handleSubmit();
+});
+</script>
+</body>
+</html>
